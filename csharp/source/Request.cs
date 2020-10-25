@@ -10,9 +10,19 @@ namespace RESTClient
 {
     public static class Request
     {
-        public static T Call<T>(RequestInfo requestInfo)
+        public static T CallWhenJsonResponse<T>(RequestInfo requestInfo)
         {
             return Call(requestInfo).DeserializeBody<T>();
+        }
+
+        public static T CallWhenXmlResponse<T>(RequestInfo requestInfo)
+        {
+            return Call(requestInfo).DeserializeBody<T>();
+        }
+
+        public static string CallWhenTextResponse(RequestInfo requestInfo)
+        {
+            return Call(requestInfo).GetBodyString();
         }
 
         public static Response Call(RequestInfo requestInfo)
@@ -27,6 +37,7 @@ namespace RESTClient
                         .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
                         .ToList();
                     res.Encoding = Encoding.GetEncoding(httpWebResponse.ContentEncoding);
+                    res.ResponseDataType = requestInfo.ResponseDataType;
 
                     using(Stream sr = httpWebResponse.GetResponseStream())
                     {
@@ -95,6 +106,7 @@ namespace RESTClient
                         .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
                         .ToList();
                     res.Encoding = Encoding.GetEncoding(httpWebResponse.ContentEncoding);
+                    res.ResponseDataType = requestInfo.ResponseDataType;
 
                     using(Stream sr = httpWebResponse.GetResponseStream())
                     {

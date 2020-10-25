@@ -10,10 +10,22 @@ namespace RESTClient
 {
     public static class RequestAsync
     {
-        public static async Task<T> Call<T>(RequestInfo requestInfo)
+        public static async Task<T> CallWhenJsonResponse<T>(RequestInfo requestInfo)
         {
             var response = await Call(requestInfo);
             return response.DeserializeBody<T>();
+        }
+
+        public static async Task<T> CallWhenXmlResponse<T>(RequestInfo requestInfo)
+        {
+            var response = await Call(requestInfo);
+            return response.DeserializeBody<T>();
+        }
+
+        public static async Task<string> CallWhenTextResponse(RequestInfo requestInfo)
+        {
+            var response = await Call(requestInfo);
+            return response.GetBodyString();;
         }
 
         public static async Task<Response> Call(RequestInfo requestInfo)
@@ -28,6 +40,7 @@ namespace RESTClient
                         .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
                         .ToList();
                     res.Encoding = Encoding.GetEncoding(httpWebResponse.ContentEncoding);
+                    res.ResponseDataType = requestInfo.ResponseDataType;
 
                     using(Stream sr = httpWebResponse.GetResponseStream())
                     {
@@ -96,6 +109,7 @@ namespace RESTClient
                         .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
                         .ToList();
                     res.Encoding = Encoding.GetEncoding(httpWebResponse.ContentEncoding);
+                    res.ResponseDataType = requestInfo.ResponseDataType;
 
                     using(Stream sr = httpWebResponse.GetResponseStream())
                     {
