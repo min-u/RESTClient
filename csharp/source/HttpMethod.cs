@@ -6,6 +6,7 @@
         HEAD,
         POST,
         PUT,
+        PATCH,
         DELETE
     }
 

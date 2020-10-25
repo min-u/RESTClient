@@ -1,26 +1,27 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace RESTClient
 {
-    public static class Request
+    public static class RequestAsync
     {
-        public static T Call<T>(RequestInfo requestInfo)
+        public static async Task<T> Call<T>(RequestInfo requestInfo)
         {
-            return Call(requestInfo).DeserializeBody<T>();
+            var response = await Call(requestInfo);
+            return response.DeserializeBody<T>();
         }
 
-        public static Response Call(RequestInfo requestInfo)
+        public static async Task<Response> Call(RequestInfo requestInfo)
         {
             try
             {
                 Response res = new Response();
-                using(var httpWebResponse = GetHttpWebResponse(requestInfo))
+                using(var httpWebResponse = await GetHttpWebResponse(requestInfo))
                 {
                     res.StatusCode = httpWebResponse.StatusCode;
                     res.Headers = httpWebResponse.Headers.AllKeys
@@ -50,7 +51,7 @@ namespace RESTClient
             }
         }
 
-        private static HttpWebResponse GetHttpWebResponse(RequestInfo requestInfo)
+        private static async Task<HttpWebResponse> GetHttpWebResponse(RequestInfo requestInfo)
         {
             try
             {
@@ -69,7 +70,7 @@ namespace RESTClient
                     case HttpMethod.POST:
                     case HttpMethod.PUT:
                     {
-                        using(var requestStream = webRequest.GetRequestStream())
+                        using(var requestStream = await webRequest.GetRequestStreamAsync())
                         {
                             byte[] buffer = requestInfo.GetBodyBytes();
                             requestStream.Write(buffer, buffer.Length, buffer.Count());
@@ -83,7 +84,7 @@ namespace RESTClient
                         break;
                 }
 
-                return (HttpWebResponse) webRequest.GetResponse();
+                return await webRequest.GetResponseAsync() as HttpWebResponse;
             }
             catch(WebException exWeb)
             {
@@ -115,3 +116,4 @@ namespace RESTClient
         }
     }
 }
+
