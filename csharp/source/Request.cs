@@ -1,4 +1,6 @@
 ﻿
+using RESTClient.Enum;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,58 +12,29 @@ namespace RESTClient
 {
     public static class Request
     {
-        public static T CallWhenJsonResponse<T>(RequestInfo requestInfo)
+        /// <summary>
+        /// Usage When Json Response
+        /// - force IsThrowRestExceptionWhenStatusCodeNot2xx = true
+        /// </summary>
+        public static T CallWhenJsonResponse<T>(JsonRequestInfo requestInfo)
         {
+            requestInfo.ThrowRestExceptionWhenStatusNotOK = true;
             return Call(requestInfo).DeserializeBody<T>();
-        }
-
-        public static T CallWhenXmlResponse<T>(RequestInfo requestInfo)
-        {
-            return Call(requestInfo).DeserializeBody<T>();
-        }
-
-        public static string CallWhenTextResponse(RequestInfo requestInfo)
-        {
-            return Call(requestInfo).GetBodyString();
         }
 
         public static Response Call(RequestInfo requestInfo)
         {
             try
             {
-                Response res = new Response();
-                using(var httpWebResponse = GetHttpWebResponse(requestInfo))
-                {
-                    res.StatusCode = httpWebResponse.StatusCode;
-                    res.Headers = httpWebResponse.Headers.AllKeys
-                        .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
-                        .ToList();
-                    res.Encoding = Encoding.GetEncoding(httpWebResponse.ContentEncoding);
-                    res.ResponseDataType = requestInfo.ResponseDataType;
-
-                    using(Stream sr = httpWebResponse.GetResponseStream())
-                    {
-                        res.Body = new byte[httpWebResponse.ContentLength];
-                        byte[] body = new byte[res.Body.Length];
-
-                        if(body.Length > 0)
-                        {
-                            sr.Read(body, offset: 0, count: body.Length);
-                        }
-
-                        Array.Copy(body, res.Body, body.Length);
-                    }
-                }
-
-                return res;
+                return CalHttpWebRequest(requestInfo);
             }
-            catch(Exception ex) when(!(ex is RestClientException))
+            catch(Exception ex) when(!(ex is RestException))
             {
-                throw new RestClientException(WebExceptionStatus.UnknownError, ex.Message, ex);
+                throw new RestException(WebExceptionStatus.UnknownError, ex.Message, ex);
             }
         }
 
-        private static HttpWebResponse GetHttpWebResponse(RequestInfo requestInfo)
+        private static Response CalHttpWebRequest(RequestInfo requestInfo)
         {
             try
             {
@@ -80,12 +53,12 @@ namespace RESTClient
                     case HttpMethod.POST:
                     case HttpMethod.PUT:
                     {
-                        using(var requestStream = webRequest.GetRequestStream())
-                        {
-                            byte[] buffer = requestInfo.GetBodyBytes();
-                            requestStream.Write(buffer, buffer.Length, buffer.Count());
+                        byte[] buffer = requestInfo.GetBodyBytes();
+                        webRequest.ContentLength = buffer.Length;
 
-                            webRequest.ContentLength = buffer.Count();
+                        using(Stream dataStream = webRequest.GetRequestStream())
+                        {
+                            dataStream.Write(buffer, 0, buffer.Length);
                         }
                         break;
                     }
@@ -94,35 +67,54 @@ namespace RESTClient
                         break;
                 }
 
-                return (HttpWebResponse) webRequest.GetResponse();
+                var httpWebResponse = (HttpWebResponse) webRequest.GetResponse();
+                return MakeResponse(httpWebResponse, requestInfo);
             }
             catch(WebException exWeb)
             {
-                Response res = new Response();
-                using(var httpWebResponse = (HttpWebResponse) exWeb.Response)
+                Response res = null;
+                HttpWebResponse webResponse = (HttpWebResponse) exWeb.Response;
+                if(webResponse != null)
+                    res = MakeResponse((HttpWebResponse) exWeb.Response, requestInfo);
+
+                if(requestInfo.ThrowRestExceptionWhenStatusNotOK)
+                    throw new RestException(exWeb.Status, exWeb.Message, exWeb, res);
+                else
+                    return res;
+            }
+            catch(Exception ex)
+            {
+                throw new RestException(WebExceptionStatus.UnknownError, ex.Message, ex);
+            }
+        }
+
+        private static Response MakeResponse(HttpWebResponse httpWebResponse, RequestInfo requestInfo)
+        {
+            using(httpWebResponse)
+            {
+                Response res = new Response() {
+                    StatusCode = httpWebResponse.StatusCode,
+                    Headers = httpWebResponse.Headers.AllKeys
+                            .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
+                            .ToList(),
+                    Encoding = (httpWebResponse.ContentEncoding != string.Empty) ? Encoding.GetEncoding(httpWebResponse.ContentEncoding) : requestInfo.Encoding,
+                    ResponseDataType = MediaTypeExtension.GetMediaType(httpWebResponse.ContentType)
+                };
+
+
+                using(Stream sr = httpWebResponse.GetResponseStream())
                 {
-                    res.StatusCode = httpWebResponse.StatusCode;
-                    res.Headers = httpWebResponse.Headers.AllKeys
-                        .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
-                        .ToList();
-                    res.Encoding = Encoding.GetEncoding(httpWebResponse.ContentEncoding);
-                    res.ResponseDataType = requestInfo.ResponseDataType;
+                    byte[] body = new byte[httpWebResponse.ContentLength > 0 ? httpWebResponse.ContentLength : 0];
+                    res.Body = new byte[body.Length];
 
-                    using(Stream sr = httpWebResponse.GetResponseStream())
+                    if(body.Length > 0)
                     {
-                        byte[] body = new byte[httpWebResponse.ContentLength];
                         sr.Read(body, offset: 0, count: body.Length);
-                        res.Body = new byte[body.Length];
-
                         Array.Copy(body, res.Body, body.Length);
                     }
                 }
 
-                throw new RestClientException(exWeb.Status, exWeb.Message, exWeb, res);
-            }
-            catch(Exception ex)
-            {
-                throw new RestClientException(WebExceptionStatus.UnknownError, ex.Message, ex);
+                return res;
             }
         }
     }

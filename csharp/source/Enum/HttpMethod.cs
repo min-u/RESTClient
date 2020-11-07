@@ -1,4 +1,4 @@
-﻿namespace RESTClient
+﻿namespace RESTClient.Enum
 {
     public enum HttpMethod
     {
@@ -12,6 +12,6 @@
 
     internal static class HttpMethodExtensions
     {
-        internal static string GetName(this HttpMethod httpMethod) => httpMethod.ToString().ToLower();
+        internal static string GetName(this HttpMethod httpMethod) => httpMethod.ToString();
     }
 }

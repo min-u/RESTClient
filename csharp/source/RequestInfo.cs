@@ -1,10 +1,14 @@
 ﻿using Newtonsoft.Json;
 
+using RESTClient.Enum;
+
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace RESTClient
 {
@@ -22,22 +26,23 @@ namespace RESTClient
         /// </summary>
         public MediaType RequestDataType { internal get; set; } = MediaType.JSON;
 
-        /// <summary>
-        /// default JSON
-        /// </summary>
-        public MediaType ResponseDataType { internal get; set; } = MediaType.JSON;
-
         public dynamic Query { private get; set; }
 
         public dynamic Body { private get; set; }
 
+        /// <summary>
+        /// content-type and encoding do not need to be included.
+        /// </summary>
         public dynamic Header { private get; set; }
 
         /// <summary>
         /// default UTF8
         /// </summary>
-        public Encoding Encode { internal get; set; } = Encoding.UTF8;
+        public Encoding Encoding { internal get; set; } = Encoding.UTF8;
 
+        public bool ThrowRestExceptionWhenStatusNotOK { get; set; } = false;
+
+        public bool KeepAlive { get; set; } = true;
 
         internal string GetURI() => $"{this.URI}{this.GetQuery()}";
 
@@ -52,12 +57,25 @@ namespace RESTClient
             string body = string.Empty;
             if(this.Body != null)
             {
-
                 switch(this.RequestDataType)
                 {
                     case MediaType.JSON:
                         body = JsonConvert.SerializeObject(this.Body);
                         break;
+
+                    case MediaType.XML:
+                    {
+                        XmlSerializer xml = new XmlSerializer(this.Body.GetType());
+                        using(MemoryStream ms = new MemoryStream())
+                        {
+                            xml.Serialize(ms, this.Body);
+                            using(StreamReader sr = new StreamReader(ms))
+                            {
+                                body = sr.ReadToEnd();
+                            }
+                        }
+                        break;
+                    }
 
                     default:
                         body = GetKeyValueString(this.Body);
@@ -65,7 +83,7 @@ namespace RESTClient
                 }
             }
 
-            return this.Encode.GetBytes(body);
+            return this.Encoding.GetBytes(body);
         }
 
         internal List<KeyValuePair<string, string>> GetHeader() => this.GetKeyValuePairs(this.Header);

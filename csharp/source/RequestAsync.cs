@@ -1,4 +1,6 @@
-﻿using System;
+﻿using RESTClient.Enum;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -16,18 +18,6 @@ namespace RESTClient
             return response.DeserializeBody<T>();
         }
 
-        public static async Task<T> CallWhenXmlResponse<T>(RequestInfo requestInfo)
-        {
-            var response = await Call(requestInfo);
-            return response.DeserializeBody<T>();
-        }
-
-        public static async Task<string> CallWhenTextResponse(RequestInfo requestInfo)
-        {
-            var response = await Call(requestInfo);
-            return response.GetBodyString();;
-        }
-
         public static async Task<Response> Call(RequestInfo requestInfo)
         {
             try
@@ -39,8 +29,8 @@ namespace RESTClient
                     res.Headers = httpWebResponse.Headers.AllKeys
                         .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
                         .ToList();
-                    res.Encoding = Encoding.GetEncoding(httpWebResponse.ContentEncoding);
-                    res.ResponseDataType = requestInfo.ResponseDataType;
+                    res.Encoding = (httpWebResponse.ContentEncoding != string.Empty) ? Encoding.GetEncoding(httpWebResponse.ContentEncoding) : requestInfo.Encoding;
+                    res.ResponseDataType = MediaTypeExtension.GetMediaType(httpWebResponse.ContentType);
 
                     using(Stream sr = httpWebResponse.GetResponseStream())
                     {
@@ -49,18 +39,16 @@ namespace RESTClient
 
                         if(body.Length > 0)
                         {
-                            sr.Read(body, offset: 0, count: body.Length);
+                            sr.Read(res.Body, offset: 0, count: body.Length);
                         }
-
-                        Array.Copy(body, res.Body, body.Length);
                     }
                 }
 
                 return res;
             }
-            catch(Exception ex) when(!(ex is RestClientException))
+            catch(Exception ex) when(!(ex is RestException))
             {
-                throw new RestClientException(WebExceptionStatus.UnknownError, ex.Message, ex);
+                throw new RestException(WebExceptionStatus.UnknownError, ex.Message, ex);
             }
         }
 
@@ -108,8 +96,8 @@ namespace RESTClient
                     res.Headers = httpWebResponse.Headers.AllKeys
                         .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
                         .ToList();
-                    res.Encoding = Encoding.GetEncoding(httpWebResponse.ContentEncoding);
-                    res.ResponseDataType = requestInfo.ResponseDataType;
+                    res.Encoding = (httpWebResponse.ContentEncoding != string.Empty) ? Encoding.GetEncoding(httpWebResponse.ContentEncoding) : requestInfo.Encoding;
+                    res.ResponseDataType = MediaTypeExtension.GetMediaType(httpWebResponse.ContentType);
 
                     using(Stream sr = httpWebResponse.GetResponseStream())
                     {
@@ -121,11 +109,11 @@ namespace RESTClient
                     }
                 }
 
-                throw new RestClientException(exWeb.Status, exWeb.Message, exWeb, res);
+                throw new RestException(exWeb.Status, exWeb.Message, exWeb, res);
             }
             catch(Exception ex)
             {
-                throw new RestClientException(WebExceptionStatus.UnknownError, ex.Message, ex);
+                throw new RestException(WebExceptionStatus.UnknownError, ex.Message, ex);
             }
         }
     }
