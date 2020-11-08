@@ -44,6 +44,10 @@ namespace RESTClient
 
         public bool KeepAlive { get; set; } = true;
 
+        public int TimeoutSecond { get; set; } = 1;
+
+        public int ContinueTimeoutSeconds { get; set; } = 1;
+
         internal string GetURI() => $"{this.URI}{this.GetQuery()}";
 
         private string GetQuery()

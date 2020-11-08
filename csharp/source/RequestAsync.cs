@@ -37,6 +37,8 @@ namespace RESTClient
                 HttpWebRequest webRequest = (HttpWebRequest) WebRequest.Create(requestInfo.GetURI());
                 webRequest.Method = requestInfo.Method.GetName();
                 webRequest.ContentType = requestInfo.RequestDataType.GetContentType();
+                webRequest.Timeout = requestInfo.TimeoutSecond * 1000;
+                webRequest.ContinueTimeout = requestInfo.ContinueTimeoutSeconds * 1000;
 
                 foreach(var keyValue in requestInfo.GetHeader())
                 {
