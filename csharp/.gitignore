@@ -1,0 +1,9 @@
+.vs
+packages
+source/bin
+source/obj
+
+source/bin
+source/obj
+RestClient.Test/bin
+RestClient.Test/obj
