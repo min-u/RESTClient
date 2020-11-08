@@ -15,7 +15,7 @@ using System.Text;
 namespace RestClient.Test
 {
     [TestClass]
-    public class RequestTest
+    public class RequestAsyncTest
     {
         #region Test JsonClass
         public class BodyObject
@@ -172,55 +172,65 @@ namespace RestClient.Test
         [TestMethod]
         public void Test_Call_HttpMethodGet_Success()
         {
-            var response = Request.Call(new RequestInfo() {
+            var task = RequestAsync.Call(new RequestInfo() {
                 URI = "http://localhost:8080/rest"
             });
+            task.Wait();
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.AreEqual(HttpStatusCode.OK, task.Result.StatusCode);
         }
 
         [TestMethod]
         public void Test_Call_HttpMethodPATCH_Success()
         {
-            var response = Request.Call(new RequestInfo() {
+            var task = RequestAsync.Call(new RequestInfo() {
                 URI = "http://localhost:8080/rest",
                 Method = HttpMethod.PATCH
             });
+            task.Wait();
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.AreEqual(HttpStatusCode.OK, task.Result.StatusCode);
         }
 
         [TestMethod]
         public void Test_Call_HttpMethodPOST_Success()
         {
-            var response = Request.Call(new RequestInfo() {
+            var task = RequestAsync.Call(new RequestInfo() {
                 URI = "http://localhost:8080/rest",
                 Method = HttpMethod.POST
             });
+            task.Wait();
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.AreEqual(HttpStatusCode.OK, task.Result.StatusCode);
         }
 
         [TestMethod]
         public void Test_Call_HttpMethodPUT_Success()
         {
-            var response = Request.Call(new RequestInfo() {
+            var task = RequestAsync.Call(new RequestInfo() {
                 URI = "http://localhost:8080/rest",
                 Method = HttpMethod.PUT
             });
+            task.Wait();
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.AreEqual(HttpStatusCode.OK, task.Result.StatusCode);
         }
 
         [TestMethod]
         public void Test_Call_HttpMethodDELETE_Success()
         {
-            var response = Request.Call(new RequestInfo() {
+            var task = RequestAsync.Call(new RequestInfo() {
                 URI = "http://localhost:8080/rest",
                 Method = HttpMethod.DELETE
             });
+            task.Wait();
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.AreEqual(HttpStatusCode.OK, task.Result.StatusCode);
         }
         #endregion
 
@@ -230,14 +240,15 @@ namespace RestClient.Test
         {
             int expectedIntValue = 1000;
 
-            var resposneObject = Request.CallWhenJsonResponse<ResponseObject>(new JsonRequestInfo() {
+            var task = RequestAsync.CallWhenJsonResponse<ResponseObject>(new JsonRequestInfo() {
                 URI = "http://localhost:8080/rest/json",
                 Method = HttpMethod.GET,
             });
-            ;
+            task.Wait();
 
-            Assert.IsNotNull(resposneObject);
-            Assert.AreEqual(expectedIntValue, resposneObject.intValue);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.IsNotNull(task.Result);
+            Assert.AreEqual(expectedIntValue, task.Result.intValue);
         }
 
         #endregion
@@ -251,14 +262,16 @@ namespace RestClient.Test
                 strValue = "2"
             };
 
-            var response = Request.CallWhenJsonResponse<BodyObject>(new JsonRequestInfo() {
+            var task = RequestAsync.CallWhenJsonResponse<BodyObject>(new JsonRequestInfo() {
                 URI = "http://localhost:8080/rest/json/body",
                 Method = HttpMethod.POST,
                 Body = expectedBody
             });
+            task.Wait();
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(expectedBody, response);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.IsNotNull(task.Result);
+            Assert.AreEqual(expectedBody, task.Result);
         }
 
         [TestMethod]
@@ -269,14 +282,16 @@ namespace RestClient.Test
                 strValue = "2"
             };
 
-            var response = Request.CallWhenJsonResponse<BodyObject>(new JsonRequestInfo() {
+            var task = RequestAsync.CallWhenJsonResponse<BodyObject>(new JsonRequestInfo() {
                 URI = "http://localhost:8080/rest/json/body",
                 Method = HttpMethod.PUT,
                 Body = expectedBody
             });
+            task.Wait();
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(expectedBody, response);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.IsNotNull(task.Result);
+            Assert.AreEqual(expectedBody, task.Result);
         }
 
         [TestMethod]
@@ -287,14 +302,16 @@ namespace RestClient.Test
                 strValue = "2"
             };
 
-            var response = Request.CallWhenJsonResponse<BodyObject>(new JsonRequestInfo() {
+            var task = RequestAsync.CallWhenJsonResponse<BodyObject>(new JsonRequestInfo() {
                 URI = "http://localhost:8080/rest/json/body",
                 Method = HttpMethod.PATCH,
                 Body = expectedBody
             });
+            task.Wait();
 
-            Assert.IsNotNull(response);
-            Assert.AreEqual(expectedBody, response);
+            Assert.IsTrue(task.IsCompleted);
+            Assert.IsNotNull(task.Result);
+            Assert.AreEqual(expectedBody, task.Result);
         }
 
         #endregion

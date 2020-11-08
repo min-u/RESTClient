@@ -67,7 +67,7 @@ namespace RESTClient
                         break;
                 }
 
-                var httpWebResponse = (HttpWebResponse) webRequest.GetResponse();
+                var httpWebResponse = webRequest.GetResponse() as HttpWebResponse;
                 return MakeResponse(httpWebResponse, requestInfo);
             }
             catch(WebException exWeb)
