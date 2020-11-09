@@ -1,4 +1,4 @@
-<h2>RedisClient(C#)</h2>
+<h2>RESTClient(C#)</h2>
 <h3>dependancy</h3>
 
  - .NET Framework >= 4.8
