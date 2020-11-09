@@ -19,8 +19,8 @@
 ```csharp
 using RestClient
 
-public async Response RestCall() {
-    Response resp = Request.call(new RequestInfo() {
+public Response RestCall() {
+    Response resp = Request.Call(new RequestInfo() {
         URI = 'http://example.com/books/sports/1',
         Method = HttpMethod.GET,
         RequestDataType = MediaType.JSON,
@@ -50,7 +50,7 @@ resp.GetBodyString = string
 using RestClient
 
 public async Task<Response> RestCall() {
-    Response resp = await RequestAsync.call(new RequestInfo() {
+    Response resp = await RequestAsync.Call(new RequestInfo() {
         URI = 'http://example.com/books/sports/1',
         Method = HttpMethod.GET,
         RequestDataType = MediaType.JSON,
