@@ -1,34 +1,26 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Text;
-using RestClient.Net5.Enums;
 
 namespace RestClient.Net5
 {
-    public class Request: RequestBase
+    public sealed class Request : RequestBase
     {
         public static Request GetInstance { get; } = new Lazy<Request>(() => new Request(), true).Value;
 
         private Request()
         {
         }
-
+        
         public Response Call(RequestInfo requestInfo)
         {
+            if (requestInfo == default(RequestInfo))
+                throw new ArgumentException("requestInfo is null (default)");
+
             try
             {
-                if(requestInfo == default(RequestInfo))
-                {
-                    throw new ArgumentException("requestInfo is null (default)");
-                }
-
                 return this.CallHttpWebRequest(requestInfo);
             }
-            catch(Exception ex) when (!(ex is ArgumentException) && !(ex is RESTException))
+            catch (Exception ex) when (!(ex is ArgumentException) && !(ex is RESTException))
             {
                 throw new RESTException(WebExceptionStatus.UnknownError, ex.Message, ex);
             }
@@ -38,18 +30,18 @@ namespace RestClient.Net5
         {
             try
             {
-                HttpWebRequest httpWebRequest = this.GetHttpWebRequest(requestInfo);
+                var httpWebRequest = this.GetHttpWebRequest(requestInfo);
                 var httpWebResponse = httpWebRequest.GetResponse() as HttpWebResponse;
-                
-                return MakeResponse(httpWebResponse, requestInfo);
+
+                return MakeResponse(httpWebResponse, requestInfo.Encoding);
             }
-            catch(WebException exWeb)
+            catch (WebException exWeb)
             {
-                HttpWebResponse webResponse = (HttpWebResponse) exWeb.Response;
-                if(webResponse != null)
+                var webResponse = (HttpWebResponse)exWeb.Response;
+                if (webResponse != null)
                 {
-                    Response res = MakeResponse((HttpWebResponse) exWeb.Response, requestInfo);
-                    if(res.StatusCode != HttpStatusCode.OK && requestInfo.ThrowRestExceptionWhenStatusNotOK)
+                    var res = MakeResponse((HttpWebResponse)exWeb.Response, requestInfo.Encoding);
+                    if (res.StatusCode != HttpStatusCode.OK && requestInfo.ThrowRestExceptionWhenStatusNotOK)
                     {
                         throw new RESTException(exWeb.Status, exWeb.Message, exWeb, res);
                     }
@@ -60,7 +52,7 @@ namespace RestClient.Net5
                     throw new RESTException(exWeb.Status, exWeb.Message, exWeb);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex) when (!(ex is RESTException))
             {
                 throw new RESTException(WebExceptionStatus.UnknownError, ex.Message, ex);
             }

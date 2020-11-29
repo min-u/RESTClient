@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace RestClient.Net5
 {
-    public class RequestAsync: RequestBase
+    public sealed class RequestAsync: RequestBase
     {
         public static RequestAsync GetInstance { get; } = new Lazy<RequestAsync>(() => new RequestAsync(), true).Value;
 
@@ -14,13 +14,11 @@ namespace RestClient.Net5
 
         public async Task<Response> CallAsync(RequestInfo requestInfo)
         {
+            if(requestInfo == default(RequestInfo))
+                throw new ArgumentException("requestInfo is null (default)");
+                
             try
             {
-                if(requestInfo == default(RequestInfo))
-                {
-                    throw new ArgumentException("requestInfo is null (default)");
-                }
-
                 return await this.CallHttpWebRequestAsync(requestInfo);
             }
             catch(Exception ex) when (!(ex is ArgumentException) && !(ex is RESTException))
@@ -33,17 +31,17 @@ namespace RestClient.Net5
         {
             try
             {
-                HttpWebRequest httpWebRequest = this.GetHttpWebRequest(requestInfo);
+                var httpWebRequest = await this.GetHttpWebRequestAsync(requestInfo);
                 var httpWebResponse = await httpWebRequest.GetResponseAsync() as HttpWebResponse;
                 
-                return await MakeResponseAsync(httpWebResponse, requestInfo);
+                return await MakeResponseAsync(httpWebResponse, requestInfo.Encoding);
             }
             catch(WebException exWeb)
             {
                 HttpWebResponse webResponse = (HttpWebResponse) exWeb.Response;
                 if(webResponse != null)
                 {
-                    Response res = await MakeResponseAsync((HttpWebResponse) exWeb.Response, requestInfo);
+                    Response res = await MakeResponseAsync((HttpWebResponse) exWeb.Response, requestInfo.Encoding);
                     if(res.StatusCode != HttpStatusCode.OK && requestInfo.ThrowRestExceptionWhenStatusNotOK)
                     {
                         throw new RESTException(exWeb.Status, exWeb.Message, exWeb, res);

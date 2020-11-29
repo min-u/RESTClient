@@ -163,6 +163,7 @@ HttpWebRequest의 정보를 설정하는 객체 이며 다음과 같은 프로�
  - KeepAlive: bool: keepAlive 여부를 설정 합니다. (default: true)
  - TimeoutSecond: int: 요청에 대한 timeout 시간을 절성 합니다. (default: 1s)
  - ContinueTimeoutSeconds: int: 100-Continue가 수신될 때까지 기다릴 제한 초입니다.
+ - Proxy: WebProxy: Proxy 설정을 합니다. null인 경우 설정하지 않습니다.
 
 <br />
 

@@ -5,10 +5,10 @@ namespace RestClient.Net5
 {
     public class RESTException: Exception
     {
-        public Response Response { get; private set; }
-        public WebExceptionStatus WebExceptionStatus { get; private set; }
+        public Response Response { get; init; }
+        public WebExceptionStatus WebExceptionStatus { get; init; }
 
-        internal RESTException(WebExceptionStatus webExceptionStatus, string message, Exception innerExceptoin = null, Response response = null)
+        internal RESTException(WebExceptionStatus webExceptionStatus, string message = "", Exception innerExceptoin = null, Response response = null)
             : base(message, innerExceptoin)
         {
             this.WebExceptionStatus = webExceptionStatus;

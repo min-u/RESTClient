@@ -35,6 +35,8 @@ namespace RestClient.Net5
 
         public int ContinueTimeoutSeconds { get; set; } = 1;
 
+        public WebProxy Proxy { get; set; } = null;
+
         internal string GetURI() => $"{this.URI}{this.GetQuery()}";
 
         private string GetQuery()

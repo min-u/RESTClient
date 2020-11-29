@@ -12,7 +12,7 @@ namespace RestClient.Net5
 {
     public class RequestBase
     {
-        private readonly int ONE_SECOND_MILLISECOND = 1000;
+        private readonly int MILLISECOND_ONE_SECOND = 1000;
 
         protected HttpWebRequest GetHttpWebRequest(RequestInfo requestInfo)
         {
@@ -31,7 +31,7 @@ namespace RestClient.Net5
             return httpWebRequest;
         }
 
-        protected HttpWebRequest GetHttpWebRequestAsync(RequestInfo requestInfo)
+        protected async Task<HttpWebRequest> GetHttpWebRequestAsync(RequestInfo requestInfo)
         {
             var httpWebRequest = MakeHttpWebRequest(requestInfo);
             if(requestInfo.Method == HttpMethod.Patch || requestInfo.Method == HttpMethod.Post
@@ -41,7 +41,7 @@ namespace RestClient.Net5
 
                 using(var requestStream = httpWebRequest.GetRequestStream())
                 {
-                    requestStream.Write(buffer, 0, buffer.Length);
+                    await requestStream.WriteAsync(buffer, 0, buffer.Length);
                 }
             }
             
@@ -53,8 +53,12 @@ namespace RestClient.Net5
             HttpWebRequest httpWebRequest = (HttpWebRequest) WebRequest.Create(requestInfo.GetURI());
             httpWebRequest.Method = requestInfo.Method.ToString();
             httpWebRequest.ContentType = requestInfo.RequestMediaType.GetContentType();
-            httpWebRequest.Timeout = requestInfo.TimeoutSecond * ONE_SECOND_MILLISECOND;
-            httpWebRequest.ContinueTimeout = requestInfo.ContinueTimeoutSeconds * ONE_SECOND_MILLISECOND;
+            httpWebRequest.Timeout = requestInfo.TimeoutSecond * MILLISECOND_ONE_SECOND;
+            httpWebRequest.ContinueTimeout = requestInfo.ContinueTimeoutSeconds * MILLISECOND_ONE_SECOND;
+            httpWebRequest.KeepAlive = requestInfo.KeepAlive;
+
+            if(requestInfo.Proxy != null)
+                httpWebRequest.Proxy = requestInfo.Proxy;
 
             foreach(var keyValue in requestInfo.GetHeader())
             {
@@ -64,11 +68,11 @@ namespace RestClient.Net5
             return httpWebRequest;
         }
 
-        protected Response MakeResponse(HttpWebResponse httpWebResponse, RequestInfo requestInfo)
+        protected Response MakeResponse(HttpWebResponse httpWebResponse, Encoding httpRequestEncoding)
         {
             using(httpWebResponse)
             {
-                Response res = this.InitResponse(httpWebResponse, requestInfo);
+                Response res = this.InitResponse(httpWebResponse, httpRequestEncoding);
                 using(Stream httpResponseStream = httpWebResponse.GetResponseStream())
                 {
                     byte[] body = new byte[httpWebResponse.ContentLength > 0 ? httpWebResponse.ContentLength : 0];
@@ -85,11 +89,11 @@ namespace RestClient.Net5
             }
         }
 
-        protected async Task<Response> MakeResponseAsync(HttpWebResponse httpWebResponse, RequestInfo requestInfo)
+        protected async Task<Response> MakeResponseAsync(HttpWebResponse httpWebResponse, Encoding httpRequestEncoding)
         {
             using(httpWebResponse)
             {
-                Response res = this.InitResponse(httpWebResponse, requestInfo);
+                Response res = this.InitResponse(httpWebResponse, httpRequestEncoding);
                 using(Stream httpResponseStream = httpWebResponse.GetResponseStream())
                 {
                     byte[] body = new byte[httpWebResponse.ContentLength > 0 ? httpWebResponse.ContentLength : 0];
@@ -106,16 +110,15 @@ namespace RestClient.Net5
             }
         }
 
-        private Response InitResponse(HttpWebResponse httpWebResponse, RequestInfo requestInfo)
+        private Response InitResponse(HttpWebResponse httpWebResponse, Encoding httpRequestEncoding)
         {
             return new Response() {
-                    StatusCode = httpWebResponse.StatusCode,
-                    Headers = httpWebResponse.Headers.AllKeys
-                            .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
-                            .ToList(),
-                    Encoding = (httpWebResponse.ContentEncoding != string.Empty) ? Encoding.GetEncoding(httpWebResponse.ContentEncoding) : requestInfo.Encoding,
-                    ResponseDataType = MediaTypeExtension.GetMediaType(httpWebResponse.ContentType)
-                };
+                StatusCode = httpWebResponse.StatusCode,
+                Headers = httpWebResponse.Headers.AllKeys
+                        .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
+                        .ToList(),
+                Encoding = (httpWebResponse.ContentEncoding != string.Empty) ? Encoding.GetEncoding(httpWebResponse.ContentEncoding) : httpRequestEncoding,
+                ResponseDataType = MediaTypeExtension.GetMediaType(httpWebResponse.ContentType)};
         }
     }
 }
