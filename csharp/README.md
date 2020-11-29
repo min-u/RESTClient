@@ -191,8 +191,6 @@ httpWebRequest 요청 과정에서 에러가 발생하면 throw 하는 Exception
 기본적으로는 요청과정에서의 에러와 응답 httpStatus != OK 인 경우 throw 되는 객체 이지만,  
 ThrowRestExceptionWhenStatusNotOK 설정에 따라 응답 결과가 httpStatus != OK 인 경우 throw 되지 않습니다.
 
-
-<br />  
 <br />  
 
 
