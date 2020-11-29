@@ -1,8 +1,14 @@
 <h2>RESTClient(C#)</h2>
-<h3>dependancy</h3>
+<h3>dependancy .NET framework</h3>
 
  - .NET Framework >= 4.8
- - Newtonsoft.JSON >= 12.0.0.0
+ - Newtonsoft.JSON >= 12.0.0
+ 
+<h3>dependancy .NET 5</h3>
+
+ - .NET 5
+ - Newtonsoft.JSON >= 12.0.3
+
 
 <h3>Support </h3>
 
