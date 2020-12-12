@@ -20,7 +20,7 @@ namespace RESTClient
 
         public Encoding Encoding { get; internal set; }
 
-        public List<KeyValuePair<string, string>> Headers { get; internal set; }
+        public Dictionary<string, string> Headers { get; internal set; }
 
         internal MediaType ResponseDataType { private get; set; }
 

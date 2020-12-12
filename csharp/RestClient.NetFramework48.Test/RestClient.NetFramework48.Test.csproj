@@ -66,9 +66,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\source\RESTClient.csproj">
+    <ProjectReference Include="..\RestClient.NetFramework48\RestClient.NetFramework48.csproj">
       <Project>{9b2613c7-2e9b-404a-ab64-0fa68f37adc1}</Project>
-      <Name>RESTClient</Name>
+      <Name>RestClient.NetFramework48</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

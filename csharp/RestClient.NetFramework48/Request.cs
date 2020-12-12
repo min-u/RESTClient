@@ -2,7 +2,6 @@
 using RESTClient.Enum;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -10,27 +9,17 @@ using System.Text;
 
 namespace RESTClient
 {
-    public static class ReRequest
+    public static class Request
     {
-        /// <summary>
-        /// Usage When Json Response
-        /// - force IsThrowRestExceptionWhenStatusCodeNot2xx = true
-        /// </summary>
-        public static T CallWhenJsonResponse<T>(JsonRequestInfo requestInfo)
-        {
-            requestInfo.ThrowRestExceptionWhenStatusNotOK = true;
-            return Call(requestInfo).DeserializeBody<T>();
-        }
-
         public static Response Call(RequestInfo requestInfo)
         {
             try
             {
                 return CalHttpWebRequest(requestInfo);
             }
-            catch(Exception ex) when(!(ex is RestException))
+            catch(Exception ex) when(!(ex is RESTException))
             {
-                throw new RestException(WebExceptionStatus.UnknownError, ex.Message, ex);
+                throw new RESTException(WebExceptionStatus.UnknownError, ex.Message, ex);
             }
         }
 
@@ -80,13 +69,13 @@ namespace RESTClient
                     res = MakeResponse((HttpWebResponse) exWeb.Response, requestInfo);
 
                 if(requestInfo.ThrowRestExceptionWhenStatusNotOK)
-                    throw new RestException(exWeb.Status, exWeb.Message, exWeb, res);
+                    throw new RESTException(exWeb.Status, exWeb.Message, exWeb, res);
                 else
                     return res;
             }
             catch(Exception ex)
             {
-                throw new RestException(WebExceptionStatus.UnknownError, ex.Message, ex);
+                throw new RESTException(WebExceptionStatus.UnknownError, ex.Message, ex);
             }
         }
 
@@ -97,8 +86,11 @@ namespace RESTClient
                 Response res = new Response() {
                     StatusCode = httpWebResponse.StatusCode,
                     Headers = httpWebResponse.Headers.AllKeys
-                            .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
-                            .ToList(),
+                            .Select(key => new {
+                                Key = key,
+                                Value = httpWebResponse.Headers[key]
+                            })
+                            .ToDictionary(pKey => pKey.Key, pValue => pValue.Value),
                     Encoding = (httpWebResponse.ContentEncoding != string.Empty) ? Encoding.GetEncoding(httpWebResponse.ContentEncoding) : requestInfo.Encoding,
                     ResponseDataType = MediaTypeExtension.GetMediaType(httpWebResponse.ContentType)
                 };

@@ -222,81 +222,8 @@ namespace RestClient.Test
 
             Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
         }
-        #endregion
-
-        #region Json
-        [TestMethod]
-        public void Test_CallWenJsonResponse()
-        {
-            int expectedIntValue = 1000;
-
-            var resposneObject = Request.CallWhenJsonResponse<ResponseObject>(new JsonRequestInfo() {
-                URI = "http://localhost:8080/rest/json",
-                Method = HttpMethod.GET,
-            });
-            ;
-
-            Assert.IsNotNull(resposneObject);
-            Assert.AreEqual(expectedIntValue, resposneObject.intValue);
-        }
 
         #endregion
 
-        #region Request / Response Body Test (JSON)
-        [TestMethod]
-        public void Test_CallWenJsonResponse_httpPOSTAndHasPostValue()
-        {
-            var expectedBody = new BodyObject() {
-                intValue = 1,
-                strValue = "2"
-            };
-
-            var response = Request.CallWhenJsonResponse<BodyObject>(new JsonRequestInfo() {
-                URI = "http://localhost:8080/rest/json/body",
-                Method = HttpMethod.POST,
-                Body = expectedBody
-            });
-
-            Assert.IsNotNull(response);
-            Assert.AreEqual(expectedBody, response);
-        }
-
-        [TestMethod]
-        public void Test_CallWenJsonResponse_httpPUTAndHasPostValue()
-        {
-            var expectedBody = new BodyObject() {
-                intValue = 1,
-                strValue = "2"
-            };
-
-            var response = Request.CallWhenJsonResponse<BodyObject>(new JsonRequestInfo() {
-                URI = "http://localhost:8080/rest/json/body",
-                Method = HttpMethod.PUT,
-                Body = expectedBody
-            });
-
-            Assert.IsNotNull(response);
-            Assert.AreEqual(expectedBody, response);
-        }
-
-        [TestMethod]
-        public void Test_CallWenJsonResponse_httpPATCHAndHasPostValue()
-        {
-            var expectedBody = new BodyObject() {
-                intValue = 1,
-                strValue = "2"
-            };
-
-            var response = Request.CallWhenJsonResponse<BodyObject>(new JsonRequestInfo() {
-                URI = "http://localhost:8080/rest/json/body",
-                Method = HttpMethod.PATCH,
-                Body = expectedBody
-            });
-
-            Assert.IsNotNull(response);
-            Assert.AreEqual(expectedBody, response);
-        }
-
-        #endregion
     }
 }

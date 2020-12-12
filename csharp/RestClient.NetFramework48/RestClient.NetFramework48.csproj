@@ -46,14 +46,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enum\HttpMethod.cs" />
-    <Compile Include="JsonRequestInfo.cs" />
     <Compile Include="Enum\MediaType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Request.cs" />
     <Compile Include="RequestAsync.cs" />
     <Compile Include="RequestInfo.cs" />
     <Compile Include="Response.cs" />
-    <Compile Include="RestException.cs" />
+    <Compile Include="RESTException.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

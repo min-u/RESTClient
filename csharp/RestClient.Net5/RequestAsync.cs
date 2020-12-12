@@ -2,7 +2,7 @@ using System;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace RestClient.Net5
+namespace RESTClient
 {
     public sealed class RequestAsync: RequestBase
     {
@@ -16,12 +16,12 @@ namespace RestClient.Net5
         {
             if(requestInfo == default(RequestInfo))
                 throw new ArgumentException("requestInfo is null (default)");
-                
+
             try
             {
                 return await this.CallHttpWebRequestAsync(requestInfo);
             }
-            catch(Exception ex) when (!(ex is ArgumentException) && !(ex is RESTException))
+            catch(Exception ex) when(!(ex is ArgumentException) && !(ex is RESTException))
             {
                 throw new RESTException(WebExceptionStatus.UnknownError, ex.Message, ex);
             }
@@ -33,7 +33,7 @@ namespace RestClient.Net5
             {
                 var httpWebRequest = await this.GetHttpWebRequestAsync(requestInfo);
                 var httpWebResponse = await httpWebRequest.GetResponseAsync() as HttpWebResponse;
-                
+
                 return await MakeResponseAsync(httpWebResponse, requestInfo.Encoding);
             }
             catch(WebException exWeb)

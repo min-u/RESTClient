@@ -1,7 +1,7 @@
 using System;
 using System.Net;
 
-namespace RestClient.Net5
+namespace RESTClient
 {
     public class RESTException: Exception
     {

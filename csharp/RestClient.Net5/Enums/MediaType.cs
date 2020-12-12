@@ -1,4 +1,4 @@
-namespace RestClient.Net5.Enums
+namespace RESTClient.Enums
 {
     public enum MediaType
     {
@@ -11,7 +11,6 @@ namespace RestClient.Net5.Enums
     {
         private const string CONTENT_TYPE_JSON = "application/json";
         private const string CONTENT_TYPE_FORM = "application/x-www-form-urlencoded";
-        private const string CONTENT_TYPE_XML = "text/xml";
         private const string CONTENT_TYPE_TEXT = "text/plan";
 
         internal static string GetContentType(this MediaType mediaType)

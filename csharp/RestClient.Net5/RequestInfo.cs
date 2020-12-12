@@ -1,3 +1,7 @@
+using Newtonsoft.Json;
+
+using RESTClient.Enums;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -5,11 +9,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 
-using RestClient.Net5.Enums;
-
-using Newtonsoft.Json;
-
-namespace RestClient.Net5
+namespace RESTClient
 {
     public class RequestInfo
     {
@@ -70,7 +70,7 @@ namespace RestClient.Net5
         private List<KeyValuePair<string, string>> GetKeyValuePairs(dynamic obj)
         {
             List<KeyValuePair<string, string>> keyValuePairs = null;
-            if (obj != null)
+            if(obj != null)
             {
                 Type type = obj.GetType();
                 keyValuePairs = type.GetFields()

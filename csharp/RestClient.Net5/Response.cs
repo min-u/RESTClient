@@ -1,11 +1,13 @@
+using Newtonsoft.Json;
+
+using RESTClient.Enums;
+
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
-using Newtonsoft.Json;
-using RestClient.Net5.Enums;
 
-namespace RestClient.Net5
+namespace RESTClient
 {
     public class Response
     {
@@ -15,7 +17,7 @@ namespace RestClient.Net5
 
         public Encoding Encoding { get; internal set; }
 
-        public List<KeyValuePair<string, string>> Headers { get; internal set; }
+        public Dictionary<string, string> Headers { get; internal set; }
 
         public MediaType ResponseDataType { get; internal set; }
 

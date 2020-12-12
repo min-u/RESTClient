@@ -1,14 +1,14 @@
+using RESTClient.Enums;
+
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using RestClient.Net5.Enums;
 
-namespace RestClient.Net5
+namespace RESTClient
 {
     public class RequestBase
     {
@@ -18,16 +18,15 @@ namespace RestClient.Net5
         {
             var httpWebRequest = MakeHttpWebRequest(requestInfo);
             if(requestInfo.Method == HttpMethod.Patch || requestInfo.Method == HttpMethod.Post
-                || requestInfo.Method == HttpMethod.Put) {
+                || requestInfo.Method == HttpMethod.Put)
+            {
                 byte[] buffer = requestInfo.GetBodyBytes();
                 httpWebRequest.ContentLength = buffer.Length;
 
-                using(var requestStream = httpWebRequest.GetRequestStream())
-                {
-                    requestStream.Write(buffer, 0, buffer.Length);
-                }
+                using var requestStream = httpWebRequest.GetRequestStream();
+                requestStream.Write(buffer.AsSpan(0, buffer.Length));
             }
-            
+
             return httpWebRequest;
         }
 
@@ -35,16 +34,15 @@ namespace RestClient.Net5
         {
             var httpWebRequest = MakeHttpWebRequest(requestInfo);
             if(requestInfo.Method == HttpMethod.Patch || requestInfo.Method == HttpMethod.Post
-                || requestInfo.Method == HttpMethod.Put) {
+                || requestInfo.Method == HttpMethod.Put)
+            {
                 byte[] buffer = requestInfo.GetBodyBytes();
                 httpWebRequest.ContentLength = buffer.Length;
 
-                using(var requestStream = httpWebRequest.GetRequestStream())
-                {
-                    await requestStream.WriteAsync(buffer, 0, buffer.Length);
-                }
+                using var requestStream = httpWebRequest.GetRequestStream();
+                await requestStream.WriteAsync(buffer.AsMemory(0, buffer.Length));
             }
-            
+
             return httpWebRequest;
         }
 
@@ -72,7 +70,7 @@ namespace RestClient.Net5
         {
             using(httpWebResponse)
             {
-                Response res = this.InitResponse(httpWebResponse, httpRequestEncoding);
+                Response res = InitResponse(httpWebResponse, httpRequestEncoding);
                 using(Stream httpResponseStream = httpWebResponse.GetResponseStream())
                 {
                     byte[] body = new byte[httpWebResponse.ContentLength > 0 ? httpWebResponse.ContentLength : 0];
@@ -93,7 +91,7 @@ namespace RestClient.Net5
         {
             using(httpWebResponse)
             {
-                Response res = this.InitResponse(httpWebResponse, httpRequestEncoding);
+                Response res = InitResponse(httpWebResponse, httpRequestEncoding);
                 using(Stream httpResponseStream = httpWebResponse.GetResponseStream())
                 {
                     byte[] body = new byte[httpWebResponse.ContentLength > 0 ? httpWebResponse.ContentLength : 0];
@@ -101,7 +99,7 @@ namespace RestClient.Net5
 
                     if(body.Length > 0)
                     {
-                        await httpResponseStream.ReadAsync(body, offset: 0, count: body.Length);
+                        await httpResponseStream.ReadAsync(body.AsMemory(start: 0, length: body.Length));
                         Array.Copy(body, res.Body, body.Length);
                     }
                 }
@@ -110,15 +108,16 @@ namespace RestClient.Net5
             }
         }
 
-        private Response InitResponse(HttpWebResponse httpWebResponse, Encoding httpRequestEncoding)
-        {
-            return new Response() {
-                StatusCode = httpWebResponse.StatusCode,
-                Headers = httpWebResponse.Headers.AllKeys
-                        .Select(key => new KeyValuePair<string, string>(key, httpWebResponse.Headers[key]))
-                        .ToList(),
-                Encoding = (httpWebResponse.ContentEncoding != string.Empty) ? Encoding.GetEncoding(httpWebResponse.ContentEncoding) : httpRequestEncoding,
-                ResponseDataType = MediaTypeExtension.GetMediaType(httpWebResponse.ContentType)};
-        }
+        private static Response InitResponse(HttpWebResponse httpWebResponse, Encoding httpRequestEncoding) => new Response() {
+            StatusCode = httpWebResponse.StatusCode,
+            Headers = httpWebResponse.Headers.AllKeys
+                    .Select(key => new {
+                        Key = key,
+                        Value = httpWebResponse.Headers[key]
+                    })
+                    .ToDictionary(pKey => pKey.Value, pValue => pValue.Value),
+            Encoding = string.IsNullOrEmpty(httpWebResponse.ContentEncoding) ? httpRequestEncoding : Encoding.GetEncoding(httpWebResponse.ContentEncoding),
+            ResponseDataType = MediaTypeExtension.GetMediaType(httpWebResponse.ContentType)
+        };
     }
 }
