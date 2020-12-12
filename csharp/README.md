@@ -67,7 +67,7 @@ public async Task<Response> RestCall() {
 
 resp.StatusCode => System.Net.HttpStatusCode
 resp.Encoding => Systen.Encoding
-resp.Headers => List<KeyValuePair<string, string>>
+resp.Headers => Dictionary<string, string>
 resp.Body => byte[]
 
 // when ResponseDataType in (JSON, XML)
@@ -113,7 +113,7 @@ public async Task<Response> RestCallAsync() {
 
 resp.StatusCode => System.Net.HttpStatusCode
 resp.Encoding => Systen.Encoding
-resp.Headers => List<KeyValuePair<string, string>>
+resp.Headers => Dictionary<string, string>
 resp.Body => byte[]
 
 // when ResponseDataType in (JSON, XML)
