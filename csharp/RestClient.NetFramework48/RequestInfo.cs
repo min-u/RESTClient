@@ -48,6 +48,8 @@ namespace RESTClient
 
         public int ContinueTimeoutSeconds { get; set; } = 1;
 
+        public WebProxy Proxy { internal get; set; } = default;
+
         internal string GetURI() => $"{this.URI}{this.GetQuery()}";
 
         private string GetQuery()

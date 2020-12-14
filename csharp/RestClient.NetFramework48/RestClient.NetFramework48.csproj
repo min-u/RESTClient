@@ -51,6 +51,7 @@
     <Compile Include="Request.cs" />
     <Compile Include="RequestAsync.cs" />
     <Compile Include="RequestInfo.cs" />
+    <Compile Include="RequestResult.cs" />
     <Compile Include="Response.cs" />
     <Compile Include="RESTException.cs" />
   </ItemGroup>

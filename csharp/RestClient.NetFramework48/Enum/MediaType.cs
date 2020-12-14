@@ -38,15 +38,15 @@
 
         internal static MediaType GetMediaType(string contentType)
         {
-            if(contentType == CONTENT_TYPE_JSON)
+            if(contentType.Contains(CONTENT_TYPE_JSON))
             {
                 return MediaType.JSON;
             }
-            else if(contentType == CONTENT_TYPE_FORM)
+            else if(contentType.Contains(CONTENT_TYPE_FORM))
             {
                 return MediaType.FORM;
             }
-            else if(contentType == CONTENT_TYPE_XML)
+            else if(contentType.Contains(CONTENT_TYPE_XML))
             {
                 return MediaType.XML;
             }

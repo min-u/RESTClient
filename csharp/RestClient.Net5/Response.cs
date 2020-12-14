@@ -11,6 +11,10 @@ namespace RESTClient
 {
     public class Response
     {
+        private static JsonSerializerSettings ignoreMissingMemberJsonSerializeSettings = new JsonSerializerSettings() {
+            MissingMemberHandling = MissingMemberHandling.Ignore
+        };
+
         public HttpStatusCode StatusCode { get; internal set; }
 
         public byte[] Body { get; internal set; }
@@ -23,16 +27,12 @@ namespace RESTClient
 
         public string GetBodyString() => Encoding.GetString(this.Body);
 
-        public T DeserializeBody<T>()
+        public T DeserializeJson<T>(bool ignoreMissingMember = false)
         {
-            if(ResponseDataType == MediaType.JSON)
-            {
-                return JsonConvert.DeserializeObject<T>(this.GetBodyString());
-            }
+            if(ignoreMissingMember)
+                return JsonConvert.DeserializeObject<T>(this.GetBodyString(), ignoreMissingMemberJsonSerializeSettings);
             else
-            {
-                throw new NotSupportedException("not support Response#DeserializeBody: ResponseDataType not in ('JSON')");
-            }
+                return JsonConvert.DeserializeObject<T>(this.GetBodyString());
         }
     }
 }

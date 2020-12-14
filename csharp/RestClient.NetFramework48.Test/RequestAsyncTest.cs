@@ -178,7 +178,7 @@ namespace RestClient.Test
             task.Wait();
 
             Assert.IsTrue(task.IsCompleted);
-            Assert.AreEqual(HttpStatusCode.OK, task.Result.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, task.Result.Response.StatusCode);
         }
 
         [TestMethod]
@@ -191,7 +191,7 @@ namespace RestClient.Test
             task.Wait();
 
             Assert.IsTrue(task.IsCompleted);
-            Assert.AreEqual(HttpStatusCode.OK, task.Result.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, task.Result.Response.StatusCode);
         }
 
         [TestMethod]
@@ -204,7 +204,7 @@ namespace RestClient.Test
             task.Wait();
 
             Assert.IsTrue(task.IsCompleted);
-            Assert.AreEqual(HttpStatusCode.OK, task.Result.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, task.Result.Response.StatusCode);
         }
 
         [TestMethod]
@@ -217,7 +217,7 @@ namespace RestClient.Test
             task.Wait();
 
             Assert.IsTrue(task.IsCompleted);
-            Assert.AreEqual(HttpStatusCode.OK, task.Result.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, task.Result.Response.StatusCode);
         }
 
         [TestMethod]
@@ -230,7 +230,7 @@ namespace RestClient.Test
             task.Wait();
 
             Assert.IsTrue(task.IsCompleted);
-            Assert.AreEqual(HttpStatusCode.OK, task.Result.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, task.Result.Response.StatusCode);
         }
         #endregion
 

@@ -11,16 +11,23 @@ namespace RESTClient
 {
     public static class Request
     {
-        public static Response Call(RequestInfo requestInfo)
+        public static RequestResult Call(RequestInfo requestInfo)
         {
+            var callResult = new RequestResult();
             try
             {
-                return CalHttpWebRequest(requestInfo);
+                callResult.Response = CalHttpWebRequest(requestInfo);
             }
-            catch(Exception ex) when(!(ex is RESTException))
+            catch(RESTException restException)
             {
-                throw new RESTException(WebExceptionStatus.UnknownError, ex.Message, ex);
+                callResult.Exception = restException;
             }
+            catch(Exception ex)
+            {
+                callResult.Exception = new RESTException(WebExceptionStatus.UnknownError, ex.Message, ex);
+            }
+
+            return callResult;
         }
 
         private static Response CalHttpWebRequest(RequestInfo requestInfo)
@@ -33,10 +40,11 @@ namespace RESTClient
                 webRequest.Timeout = requestInfo.TimeoutSecond * 1000;
                 webRequest.ContinueTimeout = requestInfo.ContinueTimeoutSeconds * 1000;
 
+                if(requestInfo.Proxy == default)
+                    webRequest.Proxy = requestInfo.Proxy;
+
                 foreach(var keyValue in requestInfo.GetHeader())
-                {
                     webRequest.Headers.Add(keyValue.Key, keyValue.Value);
-                }
 
                 switch(requestInfo.Method)
                 {

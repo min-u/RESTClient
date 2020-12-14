@@ -172,55 +172,55 @@ namespace RestClient.Test
         [TestMethod]
         public void Test_Call_HttpMethodGet_Success()
         {
-            var response = Request.Call(new RequestInfo() {
+            var result = Request.Call(new RequestInfo() {
                 URI = "http://localhost:8080/rest"
             });
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, result.Response.StatusCode);
         }
 
         [TestMethod]
         public void Test_Call_HttpMethodPATCH_Success()
         {
-            var response = Request.Call(new RequestInfo() {
+            var result = Request.Call(new RequestInfo() {
                 URI = "http://localhost:8080/rest",
                 Method = HttpMethod.PATCH
             });
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, result.Response.StatusCode);
         }
 
         [TestMethod]
         public void Test_Call_HttpMethodPOST_Success()
         {
-            var response = Request.Call(new RequestInfo() {
+            var result = Request.Call(new RequestInfo() {
                 URI = "http://localhost:8080/rest",
                 Method = HttpMethod.POST
             });
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, result.Response.StatusCode);
         }
 
         [TestMethod]
         public void Test_Call_HttpMethodPUT_Success()
         {
-            var response = Request.Call(new RequestInfo() {
+            var result = Request.Call(new RequestInfo() {
                 URI = "http://localhost:8080/rest",
                 Method = HttpMethod.PUT
             });
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, result.Response.StatusCode);
         }
 
         [TestMethod]
         public void Test_Call_HttpMethodDELETE_Success()
         {
-            var response = Request.Call(new RequestInfo() {
+            var result = Request.Call(new RequestInfo() {
                 URI = "http://localhost:8080/rest",
                 Method = HttpMethod.DELETE
             });
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.OK, result.Response.StatusCode);
         }
 
         #endregion
