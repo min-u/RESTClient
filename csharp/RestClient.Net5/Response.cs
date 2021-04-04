@@ -2,7 +2,6 @@ using Newtonsoft.Json;
 
 using RESTClient.Enums;
 
-using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
@@ -11,7 +10,7 @@ namespace RESTClient
 {
     public class Response
     {
-        private static JsonSerializerSettings ignoreMissingMemberJsonSerializeSettings = new JsonSerializerSettings() {
+        private static readonly JsonSerializerSettings ignoreMissingMemberJsonSerializeSettings = new() {
             MissingMemberHandling = MissingMemberHandling.Ignore
         };
 

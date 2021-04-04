@@ -25,6 +25,8 @@ namespace RESTClient
 
         public dynamic Headers { private get; set; }
 
+        public Dictionary<string, string> HeaderdKeyValue { get; set; } = default;
+
         public Encoding Encoding { internal get; set; } = Encoding.UTF8;
 
         public bool ThrowRestExceptionWhenStatusNotOK { get; set; } = false;
@@ -65,7 +67,16 @@ namespace RESTClient
             return this.Encoding.GetBytes(body);
         }
 
-        internal List<KeyValuePair<string, string>> GetHeader() => this.GetKeyValuePairs(this.Headers);
+        internal List<KeyValuePair<string, string>> GetHeader()
+        {
+            if(this.HeaderdKeyValue != default && this.Headers != null)
+            {
+                throw new RESTException(WebExceptionStatus.UnknownError, "Only one of HeaderdKeyValue and Headers should be used.");
+            }
+
+            return this.HeaderdKeyValue == default ? this.GetKeyValuePairs(this.Headers) : HeaderdKeyValue.ToList();
+        }
+
 
         private List<KeyValuePair<string, string>> GetKeyValuePairs(dynamic obj)
         {

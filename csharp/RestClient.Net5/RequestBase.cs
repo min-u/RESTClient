@@ -17,8 +17,8 @@ namespace RESTClient
         protected HttpWebRequest GetHttpWebRequest(RequestInfo requestInfo)
         {
             var httpWebRequest = MakeHttpWebRequest(requestInfo);
-            if(requestInfo.Method == HttpMethod.Patch || requestInfo.Method == HttpMethod.Post
-                || requestInfo.Method == HttpMethod.Put)
+            if(requestInfo.Method == HttpMethod.Patch || requestInfo.Method == HttpMethod.Post ||
+               requestInfo.Method == HttpMethod.Put)
             {
                 byte[] buffer = requestInfo.GetBodyBytes();
                 httpWebRequest.ContentLength = buffer.Length;
@@ -33,13 +33,13 @@ namespace RESTClient
         protected async Task<HttpWebRequest> GetHttpWebRequestAsync(RequestInfo requestInfo)
         {
             var httpWebRequest = MakeHttpWebRequest(requestInfo);
-            if(requestInfo.Method == HttpMethod.Patch || requestInfo.Method == HttpMethod.Post
-                || requestInfo.Method == HttpMethod.Put)
+            if(requestInfo.Method == HttpMethod.Patch || requestInfo.Method == HttpMethod.Post ||
+               requestInfo.Method == HttpMethod.Put)
             {
                 byte[] buffer = requestInfo.GetBodyBytes();
                 httpWebRequest.ContentLength = buffer.Length;
 
-                using var requestStream = httpWebRequest.GetRequestStream();
+                await using var requestStream = await httpWebRequest.GetRequestStreamAsync();
                 await requestStream.WriteAsync(buffer.AsMemory(0, buffer.Length));
             }
 
@@ -78,7 +78,7 @@ namespace RESTClient
 
                     if(body.Length > 0)
                     {
-                        httpResponseStream.Read(body, offset: 0, count: body.Length);
+                        httpResponseStream.Read(body.AsSpan(0, body.Length));
                         Array.Copy(body, res.Body, body.Length);
                     }
                 }
